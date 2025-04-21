@@ -16,7 +16,8 @@ categorias = [
 def mediana_categoria(data, categorias):
     """
     Entradas:
-        - data: Un dataframe 
+        - data: Un dataframe de pandas.
+        
     """
     # Calcular la mediana de cada categoría por país
     medianas_por_pais = data.groupby('Country')[categorias].median()
