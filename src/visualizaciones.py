@@ -163,3 +163,8 @@ def crear_graf_lineas(data, col_car1, col_car2, col_data, etiqueta_eje_x, etique
     plt.savefig(ruta_completa)
     # Mostrar el gráfico
     plt.show()
+
+# ==============================================================================
+# Grafico de correlación
+# ==============================================================================
+
