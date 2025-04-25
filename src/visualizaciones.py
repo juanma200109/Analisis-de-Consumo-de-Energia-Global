@@ -170,7 +170,42 @@ def crear_graf_lineas(data, col_car1, col_car2, col_data, etiqueta_eje_x, etique
 # Grafico de correlación
 # ==============================================================================
 
+def crear_grafico_correlacion(data, cols, agrupar_por, titulo):
+    """
+    Entradas:
+        - data: Es la información que se va a graficar (dataframe).
+        - cols: Lista de columnas que se van a graficar (dataframe).
+        - titulo: Título del gráfico (string).
 
+    Salida:
+        - Un gráfico de correlación que muestra la relación entre las dos variables.
+        - El gráfico se guarda como un archivo PNG en la ruta '../reporte/figuras/'
+          con un nombre de archivo generado a partir del nombre de la columna del eje y.
+        - El gráfico también se muestra en pantalla.
+    """
+    # Ordenando el dataframe por país y luego por año
+    df_ordenado = data.sort_values(by=[agrupar_por])
+
+    # Obteniendo la lista única de países
+    lista_paises = df_ordenado[agrupar_por].unique().tolist()
+
+    # Agrupando por país y año y calculando la media (esto ya lo tenías bien)
+    df_agrupado = df_ordenado.groupby([agrupar_por]).mean().reset_index()
+
+    corr_matrix = df_agrupado[cols].corr()
+    plt.figure(figsize=(12, 8))
+    sns.heatmap(corr_matrix,
+                annot=True,            # Mostrar valores
+                cmap='coolwarm',       # Colormap
+                linewidths=0.5,        # Ancho de bordes
+                fmt=".2f",             # Formato decimal
+                annot_kws={"size": 10},
+                vmin=-1, 
+                vmax=1)       # Rango de colores = 1
+
+    plt.title(titulo, pad = 20)
+    plt.show()
+    
 
 # ==============================================================================
 # Grafico interactivo de líneas
@@ -191,7 +226,7 @@ def crear_graf_interactivo(dataframe):
     """
     # Función intermedia para usar con interact
     def actualizar_grafico(col_car1, col_car2, col_data, etiqueta_x, etiqueta_y, titulo):
-        crear_graf_lineas(dataframe, col_car1, col_car2, col_data, etiqueta_x, etiqueta_y, titulo)
+        crear_graf_lineas(dataframe , col_car1, col_car2, col_data, etiqueta_x, etiqueta_y, titulo)
     
     # Crear los widgets
     columnas = list(dataframe.columns)
