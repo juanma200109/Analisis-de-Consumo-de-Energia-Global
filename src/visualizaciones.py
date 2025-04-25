@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
+import ipywidgets as widgets
+from ipywidgets import interact, fixed, interactive, VBox, HBox
 
 # ==============================================================================
 # Funcióin para crear histogramas
@@ -168,3 +170,91 @@ def crear_graf_lineas(data, col_car1, col_car2, col_data, etiqueta_eje_x, etique
 # Grafico de correlación
 # ==============================================================================
 
+
+
+# ==============================================================================
+# Grafico interactivo de líneas
+# ==============================================================================
+
+def crear_graf_interactivo(dataframe):
+    """
+    Crea una interfaz interactiva para la función crear_graf_lineas
+    
+    Parámetros:
+    -----------
+    dataframe: pandas DataFrame
+        El dataframe con los datos a visualizar
+    
+    Retorna:
+    --------
+    Un widget interactivo para visualizar los datos
+    """
+    # Función intermedia para usar con interact
+    def actualizar_grafico(col_car1, col_car2, col_data, etiqueta_x, etiqueta_y, titulo):
+        crear_graf_lineas(dataframe, col_car1, col_car2, col_data, etiqueta_x, etiqueta_y, titulo)
+    
+    # Crear los widgets
+    columnas = list(dataframe.columns)
+    
+    col_car1_dropdown = widgets.Dropdown(
+        options=columnas,
+        description='Categoría:',
+        style={'description_width': 'initial'},
+        layout=widgets.Layout(width='300px')
+    )
+    
+    col_car2_dropdown = widgets.Dropdown(
+        options=columnas,
+        description='Tiempo:',
+        style={'description_width': 'initial'},
+        layout=widgets.Layout(width='300px')
+    )
+    
+    col_data_dropdown = widgets.Dropdown(
+        options=columnas,
+        description='Valor:',
+        style={'description_width': 'initial'},
+        layout=widgets.Layout(width='300px')
+    )
+    
+    etiqueta_x = widgets.Text(
+        value='Año',
+        description='Etiqueta X:',
+        style={'description_width': 'initial'},
+        layout=widgets.Layout(width='300px')
+    )
+    
+    etiqueta_y = widgets.Text(
+        value='Valor',
+        description='Etiqueta Y:',
+        style={'description_width': 'initial'},
+        layout=widgets.Layout(width='300px')
+    )
+    
+    titulo_widget = widgets.Text(
+        value='Gráfico de líneas',
+        description='Título:',
+        style={'description_width': 'initial'},
+        layout=widgets.Layout(width='300px')
+    )
+    
+    # Crear el widget interactivo
+    interactive_plot = interactive(
+        actualizar_grafico,
+        col_car1=col_car1_dropdown,
+        col_car2=col_car2_dropdown,
+        col_data=col_data_dropdown,
+        etiqueta_x=etiqueta_x,
+        etiqueta_y=etiqueta_y,
+        titulo=titulo_widget
+    )
+    
+    # Organizar mejor la disposición
+    inputs = VBox([
+        HBox([col_car1_dropdown, col_car2_dropdown]),
+        HBox([col_data_dropdown, etiqueta_x]),
+        HBox([etiqueta_y, titulo_widget])
+    ])
+    
+    # Retornar el widget completo
+    return VBox([inputs, interactive_plot.children[-1]])
