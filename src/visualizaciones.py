@@ -204,6 +204,16 @@ def crear_grafico_correlacion(data, cols, agrupar_por, titulo):
                 vmax=1)       # Rango de colores = 1
 
     plt.title(titulo, pad = 20)
+    # Crear directorio si no existe
+    ruta_figura = os.path.join('..', 'reporte', 'figuras')
+    os.makedirs(ruta_figura, exist_ok=True)
+    
+    # Nombre del archivo limpio (sin caracteres especiales)
+    nombre_archivo = "Grafico_de_correlación_" + titulo.replace(" ", "_").replace("(", "").replace(")", "").replace("/", "_")
+    ruta_completa = os.path.join(ruta_figura, nombre_archivo + ".png")
+    
+    plt.savefig(ruta_completa, dpi=300, bbox_inches="tight")
+    # Mostrar el gráfico
     plt.show()
     
 
@@ -293,3 +303,109 @@ def crear_graf_interactivo(dataframe):
     
     # Retornar el widget completo
     return VBox([inputs, interactive_plot.children[-1]])
+
+# ==============================================================================
+# Grafico de barras agrupadas
+# =============================================================================={
+def crear_grafico_barras_agrupadas(data, col_grup,col_categoria, col_subcategoria, nombre_variable, col_valor, etiqueta_x, etiqueta_y, titulo):
+    """
+    Entradas:
+        - data: Es la información que se va a graficar (dataframe).
+        - col_grup: Nombre de la columna que se va a graficar (grupo, ej: 'Country').
+        - col_categoria: Nombre de la columna que se va a graficar (categoría principal, 'Renewable Energy Share (%)').
+        - col_subcategoria: Nombre de la columna que se va a graficar (subcategoría, ej: Fossil Fuel Dependency (%)).
+        - nombre_variable: Nombre de la variable que se va a graficar (categoría, ej: Tipo de Energía).
+        - col_valor: Nombre de la columna que se va a graficar (valores, ej: 'Porcentaje').
+        - etiqueta_x: Etiqueta del eje x (ej: 'País').
+        - etiqueta_y: Etiqueta del eje y (ej: 'Porcentaje (%)').
+        - titulo: Título del gráfico 'Distribución de Tipos de Energía por País'.
+
+    Salida:
+        - Un gráfico de barras agrupadas que muestra la relación entre las dos variables.
+        - El gráfico se guarda como un archivo PNG en la ruta '../reporte/figuras/'
+          con un nombre de archivo generado a partir del nombre de la columna del eje y.
+        - El gráfico también se muestra en pantalla.
+    """
+    df_tipo_energia = data.groupby(col_grup)[[col_categoria, col_subcategoria]].mean().reset_index()
+
+    # Apilando el dataframe para crear un gráfico de barras
+    tabla_apilada = df_tipo_energia.melt(id_vars=[col_grup], var_name=nombre_variable, value_name=col_valor)
+
+    plt.figure()
+    sns.barplot(data=tabla_apilada, x=col_grup, y=col_valor, hue=nombre_variable, palette="Set2")
+    plt.title(titulo)
+    plt.xlabel(etiqueta_x)
+    plt.ylabel(etiqueta_y)
+    plt.xticks(rotation=90)
+    plt.legend(title=nombre_variable)
+    plt.tight_layout()
+
+    # Crear directorio si no existe
+    ruta_figura = os.path.join('..', 'reporte', 'figuras')
+    os.makedirs(ruta_figura, exist_ok=True)
+    
+    # Nombre del archivo limpio (sin caracteres especiales)
+    nombre_archivo = "Grafico_de_barras_agrupadas_" + col_valor.replace(" ", "_").replace("(", "").replace(")", "").replace("/", "_")
+    ruta_completa = os.path.join(ruta_figura, nombre_archivo + ".png")
+    
+    plt.savefig(ruta_completa)
+
+    plt.show()
+
+# ==============================================================================
+# Grafico de dispersión
+# ==============================================================================
+def crear_grafico_dispersion(data, col_grup, col_x, col_y, etiqueta_x, etiqueta_y, titulo):
+    """
+    Entradas:
+        - data: Es la información que se va a graficar (dataframe).
+        - col_grup: Nombre de la columna que se va a graficar (grupo, ej: 'Country').
+        - col_x: Nombre de la columna que se va a graficar en el eje x (ej: 'Total Energy Consumption (TWh)').
+        - col_y: Nombre de la columna que se va a graficar en el eje y (ej: 'Carbon Emissions (Million Tons)').
+        - etiqueta_x: Etiqueta del eje x.
+        - etiqueta_y: Etiqueta del eje y.
+        - titulo: Título del gráfico (ej: 'Relación entre el Consumo Total de Energía y las Emisiones de Carbono por País').
+
+    Salida:
+        - Un gráfico de dispersión que muestra la relación entre las dos variables.
+        - El gráfico se guarda como un archivo PNG en la ruta '../reporte/figuras/'
+          con un nombre de archivo generado a partir del nombre de la columna del eje y.
+        - El gráfico también se muestra en pantalla.
+    """
+
+    x = data.groupby(col_grup)[col_x].sum().sort_values() # Sumar el consumo total de energía por país y ordenar
+
+    y = data.groupby(col_grup)[col_y].sum().loc[x.index] # Sumar las emisiones de carbono por país y ordenar según el índice de x
+
+    paises = x.index # Obtener los nombres de los países ordenados
+
+    # Generar una lista de 10 colores únicos
+    num_paises = len(paises)
+    colores = plt.cm.tab10(np.linspace(0, 1, num_paises)) # Usamos un mapa de colores para obtener colores distintos
+
+    plt.figure()
+
+    for i, pais in enumerate(paises):
+        plt.scatter(x[pais], y[pais], color=colores[i], label=pais, alpha=0.7, edgecolors = 'black') # Graficar cada país con su respectivo color
+        plt.text(x[pais], y[pais], pais, fontsize=8, ha='right', va='bottom') # Añadir etiquetas a los puntos
+
+    plt.title(titulo, fontsize=16)
+    plt.xlabel(etiqueta_x, fontsize=12)
+    plt.ylabel(etiqueta_y, fontsize=12)
+    plt.xticks(rotation=90)
+    plt.grid(True, alpha=0.7, color='gray', linestyle='-', linewidth=0.5)
+    plt.tight_layout()
+
+    # Crear directorio si no existe
+    ruta_figura = os.path.join('..', 'reporte', 'figuras')
+    os.makedirs(ruta_figura, exist_ok=True)
+    
+    # Nombre del archivo limpio (sin caracteres especiales)
+    nombre_archivo = "Grafico_de_dispersion_" + col_y.replace(" ", "_").replace("(", "").replace(")", "").replace("/", "_")
+    ruta_completa = os.path.join(ruta_figura, nombre_archivo + ".png")
+    
+    plt.savefig(ruta_completa)
+
+    plt.show()
+
+
