@@ -306,7 +306,7 @@ def crear_graf_interactivo(dataframe):
 
 # ==============================================================================
 # Grafico de barras agrupadas
-# =============================================================================={
+# ==============================================================================
 def crear_grafico_barras_agrupadas(data, col_grup,col_categoria, col_subcategoria, nombre_variable, col_valor, etiqueta_x, etiqueta_y, titulo):
     """
     Entradas:
@@ -355,6 +355,66 @@ def crear_grafico_barras_agrupadas(data, col_grup,col_categoria, col_subcategori
 # ==============================================================================
 # Grafico de dispersión
 # ==============================================================================
+def crear_grafico_dispersion_por_año(data, col_categoria, col_subcategoria, año, col_x, col_y, etiqueta_x, etiqueta_y, titulo):
+    """
+    Entradas:
+        - data: Es la información que se va a graficar (dataframe).
+        - col_categoria: Nombre de la columna que se va a graficar (grupo, ej: 'Country').
+        - col_subcategoria: Nombre de la columna que se va a graficar (grupo, ej: 'Year').
+        - año: Año que se va a graficar (ej: '2020').
+        - col_x: Nombre de la columna que se va a graficar en el eje x (ej: 'Total Energy Consumption (TWh)').
+        - col_y: Nombre de la columna que se va a graficar en el eje y (ej: 'Carbon Emissions (Million Tons)').
+        - etiqueta_x: Etiqueta del eje x.
+        - etiqueta_y: Etiqueta del eje y.
+        - titulo: Título del gráfico (ej: 'Relación entre el Consumo Total de Energía y las Emisiones de Carbono por País').
+
+    Salida:
+        - Un gráfico de dispersión que muestra la relación entre las dos variables.
+        - El gráfico se guarda como un archivo PNG en la ruta '../reporte/figuras/'
+          con un nombre de archivo generado a partir del nombre de la columna del eje y.
+        - El gráfico también se muestra en pantalla.
+    """
+    # Agrupando los datos segun las columnas de categoria y subcategoria
+    data_agrupada = data.groupby([col_categoria, col_subcategoria])[[col_x, col_y]].sum().reset_index()
+
+    # Filtrando los datos para el año seleccionado
+    data_filtrada = data_agrupada[data_agrupada[col_subcategoria] == int(año)]
+
+    # Ordenando los datos por el eje x
+    data_filtrada = data_filtrada.sort_values(by=col_x)
+
+    x = data_filtrada[col_x]
+    y = data_filtrada[col_y]
+    etiquetas = data_filtrada[col_categoria]
+
+    colors = plt.cm.tab10(np.linspace(0, 1, len(etiquetas)))
+
+    plt.figure()
+
+    for i, etiqueta in enumerate(etiquetas):
+        plt.scatter(x.iloc[i], y.iloc[i], color=colors[i], label=etiqueta, alpha=0.8, edgecolors='black')
+        plt.text(x.iloc[i], y.iloc[i], etiqueta, fontsize=8, ha='right', va='bottom') # Añadir etiquetas a los puntos
+
+    plt.title(titulo+" - "+año, fontsize=16)
+    plt.xlabel(etiqueta_x+" - "+año, fontsize=12)
+    plt.ylabel(etiqueta_y+" - "+año, fontsize=12)
+    plt.xticks(rotation=90)
+    plt.grid(True, alpha=0.7, color='gray', linestyle='-', linewidth=0.5)
+    plt.tight_layout()
+
+    # Crear directorio si no existe
+    ruta_figura = os.path.join('..', 'reporte', 'figuras')
+    os.makedirs(ruta_figura, exist_ok=True)
+    
+    # Nombre del archivo limpio (sin caracteres especiales)
+    nombre_archivo = "Grafico_de_dispersion_" + col_y.replace(" ", "_").replace("(", "").replace(")", "").replace("/", "_") + "_" + año
+    ruta_completa = os.path.join(ruta_figura, nombre_archivo + ".png")
+    
+    plt.savefig(ruta_completa)
+
+    plt.show()
+
+
 def crear_grafico_dispersion(data, col_grup, col_x, col_y, etiqueta_x, etiqueta_y, titulo):
     """
     Entradas:
@@ -407,5 +467,3 @@ def crear_grafico_dispersion(data, col_grup, col_x, col_y, etiqueta_x, etiqueta_
     plt.savefig(ruta_completa)
 
     plt.show()
-
-
