@@ -467,3 +467,67 @@ def crear_grafico_dispersion(data, col_grup, col_x, col_y, etiqueta_x, etiqueta_
     plt.savefig(ruta_completa)
 
     plt.show()
+
+# ==============================================================================
+# Gráfico de pastel
+# ==============================================================================
+def crear_grafico_pastel(data, filtro, col_categoria, col_subcategoria, titulo, filas, columnas):
+    """
+    Entradas:
+        - data: Es la información que se va a graficar (dataframe).
+        - filtro: Filtro para la categoría (ej: 'Country').
+        - col_categoria: Nombre de la columna que se va a graficar (grupo, ej: 'Industrial Energy Use (%)').
+        - col_subcategoria: Nombre de la columna que se va a graficar (grupo, ej: 'Household Energy Use (%)').
+        - titulo: Título del gráfico (ej: 'Distribución de Tipos de Energía por País').
+
+    Salida:
+        - Un gráfico de pastel que muestra la relación entre las dos variables.
+        - El gráfico se guarda como un archivo PNG en la ruta '../reporte/figuras/'
+          con un nombre de archivo generado a partir del nombre de la columna del eje y.
+        - El gráfico también se muestra en pantalla.
+    """
+    list_data = data[filtro].unique()
+    num = len(list_data)
+
+    # Número de filas y columnas para la cuadrícula
+    fil = filas
+    col = columnas
+
+    # Crear una figura y los subgráficos
+    fig, axs = plt.subplots(nrows = fil, ncols = col)
+    axs = axs.flatten() # Aplanar la matriz de ejes para facilitar el acceso a cada subgráfico
+
+    for i, caracteristica in enumerate(list_data):
+        if i < fil * col:
+            # Filtrar los datos para la característica actual
+            data_filtrada = data[data[filtro] == caracteristica]
+
+            # Promedio de la categoria y subcategoría
+            data_category = data_filtrada[col_categoria].mean()
+            data_subcategory = data_filtrada[col_subcategoria].mean()
+
+            valores = [data_category, data_subcategory]
+
+            # Crear el gráfico de pastel
+            axs[i].pie(valores, autopct='%1.1f%%', startangle=90, colors=['#009688','#23bac4'])
+            axs[i].set_title(f"{titulo} {caracteristica}")
+            axs[i].axis('equal')
+    etiquetas = [col_categoria, col_subcategoria]
+    if num < fil * col:
+        for j in range(num, filas * columnas):
+            fig.delaxes(axs[j])
+
+    # Crear directorio si no existe
+    ruta_figura = os.path.join('..', 'reporte', 'figuras')
+    os.makedirs(ruta_figura, exist_ok=True)
+
+    # Nombre del archivo limpio (sin caracteres especiales)
+    nombre_archivo = "Grafico_de_pastel_" + col_categoria.replace(" ", "_").replace("(", "").replace(")", "").replace("/", "_")
+    ruta_completa = os.path.join(ruta_figura, nombre_archivo + ".png")
+
+
+    fig.legend(labels=etiquetas, loc='center right', bbox_to_anchor=(1.1, 1.0))
+    plt.tight_layout()
+    plt.savefig(ruta_completa)
+
+    plt.show()
