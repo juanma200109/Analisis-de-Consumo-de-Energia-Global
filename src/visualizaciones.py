@@ -494,7 +494,7 @@ def crear_grafico_pastel(data, filtro, col_categoria, col_subcategoria, titulo, 
     col = columnas
 
     # Crear una figura y los subgráficos
-    fig, axs = plt.subplots(nrows = fil, ncols = col)
+    fig, axs = plt.subplots(nrows = fil, ncols = col, figsize=(12, 15))
     axs = axs.flatten() # Aplanar la matriz de ejes para facilitar el acceso a cada subgráfico
 
     for i, caracteristica in enumerate(list_data):
