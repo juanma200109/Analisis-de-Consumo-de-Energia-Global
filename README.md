@@ -9,7 +9,7 @@ Este proyecto profundiza en veinte años de datos de consumo energético a nivel
 Las motivaciones para este proyecto son:
 
 - **Importancia de la Energía:** El suministro de energía a los hogares, comercios e industrias a impulsado el desarrollo en diferentes aspecto tanto socioeconómicos, industrial y la calidad de vida. Mejorando las condiciones para los trabajadores, personas del comun y en general a todos ya que gracias a la energía se han desarrollado maquinas capaces de mejorar las condiciones de vida como por ejemplo los electrodomesticos, computadoras, etc.
-
+<br>
 - **Transición Energética:** Desde hace decadas se viene mencionando la necesidad de mejorar las practicas de producción de energía, dado que las tradicionales dependientes de combustibles fósiles han perjudicado el medio ambiente, empeorando la calidad del aire, destruyendo la capa de ozono y provocando el conocido **Calentamiento Global**. Dado lo anterior se demuestra la importancia de diversificar la matriz energética introduciendo fuentes de energía sostenible (solar, eolica, etc.), velando por la seguridad energética y comprendiendo que los recursos fósiles son agotables.
 
 Los objetivos principales de este proyecto son:
