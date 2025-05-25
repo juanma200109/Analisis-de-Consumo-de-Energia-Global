@@ -175,6 +175,7 @@ def crear_grafico_correlacion(data, cols, agrupar_por, titulo):
     Entradas:
         - data: Es la información que se va a graficar (dataframe).
         - cols: Lista de columnas que se van a graficar (dataframe).
+        - agrupar_por: Columna que se va a agrupar (dataframe).
         - titulo: Título del gráfico (string).
 
     Salida:
